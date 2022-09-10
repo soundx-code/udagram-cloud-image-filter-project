@@ -33,17 +33,21 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
-    res.send("try GET /filteredimage?image_url={{}}")
+  app.get( "/", async ( req: Request, res: Response ) => {
+    res.status(200).send("try GET /filteredimage?image_url={{}}")
   });
 
   // Filter Image Endpoint
   // returns an absolute path to a filtered image locally saved file
-  app.get( "/filteredimage", async ( req, res ) => {
+  app.get( "/filteredimage", async ( req: Request, res: Response ) => {
     const { image_url } = req.query;
     try {
       let filterImage = await filterImageFromURL(image_url);
-      if(filterImage) res.status(200).json({ filterImage });
+      if(filterImage){
+        await deleteLocalFiles(filterImage)
+        res.status(200).json({ filterImage });
+        
+      } 
       
     } catch (error) {
       res.status(500).json({ error })
